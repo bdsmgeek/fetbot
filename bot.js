@@ -2,22 +2,27 @@
 
 var Discord = require("discord.js");
 var fs = require('fs');
+var auth = require('./auth.json');
+var config = require('./config.json');
 
 var bot = new Discord.Client({autoReconnect: true});
 
-bot.OWNERID = '<your-discord-id>';
-bot.PREFIX = '<bot-prefix>';
-bot.TOKEN = '<bot-token>';
+bot.OWNERID = auth.ownerid;
+bot.TOKEN = auth.bottoken;
 
-bot.DETAILED_LOGGING = false;
-bot.DELETE_COMMANDS = false;
+bot.PREFIX = config.botprefix;
 
-bot.COLOR = 0x351C75;
-bot.SUCCESS_COLOR = 0x00ff00;
-bot.ERROR_COLOR = 0x0000ff;
-bot.INFO_COLOR = 0x0000ff;
+bot.DETAILED_LOGGING = config.detaillogging;
+bot.DELETE_COMMANDS = config.deletecommands;
+
+// issues with this not working
+// bot.COLOR = config.bottextcolor;
+// bot.SUCCESS_COLOR = config.bottextsuccesscolor;
+// bot.ERROR_COLOR = config.bottexterrorcolor;
+// bot.INFO_COLOR = config.bottextinfocolor;
 
 String.prototype.padRight = function(l,c) {return this+Array(l-this.length+1).join(c||" ")}
+
 
 bot.sendNotification = function(info, type, msg) {
 	var icolor;
@@ -31,7 +36,7 @@ bot.sendNotification = function(info, type, msg) {
 		color: icolor,
 		description: info
 	}
-	msg.channel.sendMessage('', {embed});
+	msg.channel.send('', {embed});
 }
 
 var commands = {}
@@ -62,7 +67,7 @@ commands.help.main = function(bot, msg) {
 		}
 	}
 	
-	msg.channel.sendMessage('', {embed});
+	msg.channel.send('', {embed});
 }
 
 commands.load = {};
@@ -82,7 +87,7 @@ commands.load.main = function(bot, msg) {
     }else {
 		bot.sendNotification("You do not have permission to use this command.", "error", msg);
 	}
-}
+};
 
 commands.unload = {};
 commands.unload.args = '<command>';
@@ -101,7 +106,7 @@ commands.unload.main = function(bot, msg) {
     }else {
 		bot.sendNotification("You do not have permission to use this command.", "error", msg);
 	}
-}
+};
 
 commands.reload = {};
 commands.reload.args = '';
@@ -116,12 +121,12 @@ commands.reload.main = function(bot, msg) {
             bot.sendNotification("Reloaded " + msg.content + ".js successfully.", "success", msg);
         }
         catch(err){
-            msg.channel.sendMessage("Command not found");
+            msg.channel.send("Command not found");
         }
     }else {
 		bot.sendNotification("You do not have permission to use this command.", "error", msg);
 	}
-}
+};
 
 var loadCommands = function() {
     var files = fs.readdirSync(__dirname+'/commands');
@@ -132,7 +137,7 @@ var loadCommands = function() {
         }
     }
     console.log("———— All Commands Loaded! ————");
-}
+};
 
 var checkCommand = function(msg, isMention) {
 	if(isMention) {
@@ -144,7 +149,7 @@ var checkCommand = function(msg, isMention) {
 		msg.content = msg.content.replace(bot.PREFIX + command + " ", "");
 		if(command) commands[command].main(bot, msg);
 	}
-}
+};
 
 bot.on("ready", () => {
     console.log('Ready to begin! Serving in ' + bot.guilds.array().length + ' servers.');
@@ -155,10 +160,10 @@ bot.on("ready", () => {
 bot.on("message", msg => {
     if(msg.content.startsWith('<@'+bot.user.id+'>') || msg.content.startsWith('<@!'+bot.user.id+'>')) {
 		checkCommand(msg, true);
-		if(bot.DELETE_COMMANDS) msg.delete();
+		//if(bot.DELETE_COMMANDS) msg.delete();
     }else if (msg.content.startsWith(bot.PREFIX)) {
 		checkCommand(msg, false);
-		if(bot.DELETE_COMMANDS) msg.delete();
+		//if(bot.DELETE_COMMANDS) msg.delete();
     }
 });
 

@@ -1,0 +1,9 @@
+{
+    "botprefix": ".",
+    "detaillogging": "false",
+    "deletecommands": "false",
+    "bottextcolor": "0x351C75",
+    "bottextsuccesscolor": "0x00ff00",
+    "bottexterrorcolor": "0x0000ff",
+    "bottextinfocolor": "0x0000ff"
+}
